@@ -15,12 +15,7 @@ public class Weapon : MonoBehaviour
 
     private void Awake()
     {
-        player = GetComponentInParent<Player>();
-    }
-
-    private void Start()
-    {
-        Init();
+        player = GameManager.instance.player;
     }
 
     private void Update()
@@ -41,8 +36,25 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public void Init()
+    public void Init(ItemData data)
     { 
+        name = "Weapon "+data.itemId;
+        transform.parent = player.transform;
+        transform.localPosition = Vector3.zero;
+
+        id = data.itemId;
+        damage = data.baseDamage * Character.Damage;
+        count = data.baseCount + Character.Count;
+
+        for(int i = 0; i < GameManager.instance.pool.prefabs.Length; i++)
+        {
+            if(data.projectile == GameManager.instance.pool.prefabs[i])
+            {
+                prefabId = i;
+                break;
+            }
+        }
+
         switch(id)
         {
             case 0:
@@ -50,21 +62,30 @@ public class Weapon : MonoBehaviour
                 WeaponCirecle();
                 break;
             default:
-                speed = 0.3f;
+                speed = 0.7f;
                 Fire();
                 break;
         }
+
+        // Hand set
+        Hand hand = player.hands[(int)data.itemType];
+        hand.spriter.sprite = data.hand;
+        hand.gameObject.SetActive(true);
+
+        player.BroadcastMessage("ApplyGear", SendMessageOptions.DontRequireReceiver);
     }
 
     public void LevelUP(float damage, int count)
     {
-        this.damage = damage;
+        this.damage = damage * Character.Damage;
         this.count += count;
 
         if(id == 0)
         {
             WeaponCirecle();
         }
+
+        player.BroadcastMessage("ApplyGear", SendMessageOptions.DontRequireReceiver);
     }
 
     void WeaponCirecle()
