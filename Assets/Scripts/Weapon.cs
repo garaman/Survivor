@@ -112,6 +112,7 @@ public class Weapon : MonoBehaviour
 
             bulletPos.GetComponent<Bullet>().Init(damage, -1, Vector3.zero);
         }
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Melee);
     }
 
     void Fire()
@@ -128,5 +129,6 @@ public class Weapon : MonoBehaviour
         bulletPos.rotation = Quaternion.FromToRotation(Vector3.up, dir);
 
         bulletPos.GetComponent<Bullet>().Init(damage, count, dir);
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Range);
     }
 }

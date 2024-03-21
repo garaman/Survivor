@@ -26,10 +26,12 @@ public class GameManager : MonoBehaviour
     public LevelUp uiLevelUp;
     public Result uiResult;
     public GameObject enemyCleaner;
+    public Transform joy;
 
     private void Awake()
     {
-        instance = this;        
+        instance = this;       
+        Application.targetFrameRate = 60;
     }
     public void GameStart(int id)
     {
@@ -40,8 +42,10 @@ public class GameManager : MonoBehaviour
         player.gameObject.SetActive(true);
         uiLevelUp.Select(playerId%2);
         isLive = true;
-        
+                
         Resume();
+        AudioManager.instance.PlayBgm(true);
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Select);
     }
 
     public void GameOver()
@@ -55,7 +59,10 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         uiResult.gameObject.SetActive(true);
         uiResult.Lose();
-        Stop();        
+        Stop();
+
+        AudioManager.instance.PlayBgm(false);
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Lose);
     }
 
     public void GameVictory()
@@ -71,11 +78,18 @@ public class GameManager : MonoBehaviour
         uiResult.gameObject.SetActive(true);
         uiResult.Win();
         Stop();
+
+        AudioManager.instance.PlayBgm(false);
+        AudioManager.instance.PlaySfx(AudioManager.Sfx.Win);
     }
 
     public void GameRestart()
     {
         SceneManager.LoadScene(0);
+    }
+    public void GameQuit()
+    {
+        Application.Quit();
     }
 
     void Update()
@@ -108,11 +122,13 @@ public class GameManager : MonoBehaviour
     {
         isLive = false;
         Time.timeScale = 0;
+        joy.transform.localScale = Vector3.zero;
     }
 
     public void Resume()
     {
         isLive = true;
         Time.timeScale = 1;
+        joy.transform.localScale = Vector3.one;
     }
 }
